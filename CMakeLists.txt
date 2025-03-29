@@ -10,6 +10,7 @@ include_directories(src)
 set(SOURCES
         src/main.cpp
         src/tic_tac_toe.cpp
+        src/utils.cpp
 )
 
 add_executable(arcadetui ${SOURCES})

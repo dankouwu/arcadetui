@@ -4,6 +4,8 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <cstring>
+#include <utils.hpp>
 
 // Game state
 char board[3][3] = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
@@ -12,6 +14,9 @@ bool isXTurn = true;
 bool gameOver = false;
 char winner = ' ';
 bool isBoardFull = false;
+
+// Screen dimensions
+int screenWidth, screenHeight;
 
 // Color pairs
 #define PAIR_TITLE 1
@@ -35,33 +40,54 @@ void initColors() {
     init_pair(PAIR_SEPARATOR, COLOR_BLUE, COLOR_BLACK);
 }
 
+// Utility function to center text
+void printCentered(int y, const char* text, int colorPair, bool bold = false) {
+    int x = (screenWidth - strlen(text)) / 2;
+    if (bold) attron(COLOR_PAIR(colorPair) | A_BOLD);
+    else attron(COLOR_PAIR(colorPair));
+
+    mvprintw(y, x, "%s", text);
+
+    if (bold) attroff(COLOR_PAIR(colorPair) | A_BOLD);
+    else attroff(COLOR_PAIR(colorPair));
+}
+
 void drawTitle() {
-    attron(COLOR_PAIR(PAIR_TITLE) | A_BOLD);
-    mvprintw(1, 10, "+--------------------+");
-    mvprintw(2, 10, "|     TIC TAC TOE    |");
-    mvprintw(3, 10, "+--------------------+");
-    attroff(COLOR_PAIR(PAIR_TITLE) | A_BOLD);
+    const char* line1 = "+--------------------+";
+    const char* line2 = "|     TIC TAC TOE    |";
+    const char* line3 = "+--------------------+";
+
+    printCentered(1, line1, PAIR_TITLE, true);
+    printCentered(2, line2, PAIR_TITLE, true);
+    printCentered(3, line3, PAIR_TITLE, true);
 }
 
 void drawSeparators() {
     attron(COLOR_PAIR(PAIR_SEPARATOR) | A_BOLD);
 
+    // Calculate center position for the grid
+    int gridWidth = 11; // Width of the grid area
+    int startX = (screenWidth - gridWidth) / 2;
+
     // Vertical separators
     for (int i = 0; i < 5; i++) {
-        mvprintw(6 + i, 18, "|");
-        mvprintw(6 + i, 25, "|");
+        mvprintw(6 + i, startX + 6, "|");
+        mvprintw(6 + i, startX + 13, "|");
     }
 
     // Horizontal separators
-    mvprintw(8, 12, "-----------");
-    mvprintw(10, 12, "-----------");
+    mvprintw(8, startX, "-----------");
+    mvprintw(10, startX, "-----------");
 
     attroff(COLOR_PAIR(PAIR_SEPARATOR) | A_BOLD);
 }
 
 void drawCell(int y, int x, char value) {
+    int gridWidth = 21; // Total width of the grid area including separators
+    int startX = (screenWidth - gridWidth) / 2;
+
     int screenY = y * 2 + 6;
-    int screenX = x * 7 + 13;
+    int screenX = startX + x * 7 + 1;
 
     // Draw cell
     attron(COLOR_PAIR(PAIR_GRID));
@@ -90,6 +116,9 @@ void drawCell(int y, int x, char value) {
 void drawBoard() {
     clear();
 
+    // Get current screen dimensions
+    getmaxyx(stdscr, screenHeight, screenWidth);
+
     // Draw title
     drawTitle();
 
@@ -104,34 +133,39 @@ void drawBoard() {
     }
 
     // Draw status message
-    attron(COLOR_PAIR(PAIR_STATUS) | A_BOLD);
+    char statusMsg[50];
     if (!gameOver) {
-        mvprintw(13, 10, "Player %c's turn", isXTurn ? 'X' : 'O');
+        sprintf(statusMsg, "Player %c's turn", isXTurn ? 'X' : 'O');
+        printCentered(13, statusMsg, PAIR_STATUS, true);
+
+        // Modify the position of the X/O indicator to be centered
+        int msgLen = strlen(statusMsg);
+        int centerX = (screenWidth - msgLen) / 2;
+        int xPos = centerX + 8; // Position after "Player " in the message
+
         if (isXTurn) {
-            attron(COLOR_PAIR(PAIR_X));
-            mvprintw(13, 17, "X");
-            attroff(COLOR_PAIR(PAIR_X));
+            attron(COLOR_PAIR(PAIR_X) | A_BOLD);
+            mvprintw(13, xPos, "X");
+            attroff(COLOR_PAIR(PAIR_X) | A_BOLD);
         } else {
-            attron(COLOR_PAIR(PAIR_O));
-            mvprintw(13, 17, "O");
-            attroff(COLOR_PAIR(PAIR_O));
+            attron(COLOR_PAIR(PAIR_O) | A_BOLD);
+            mvprintw(13, xPos, "O");
+            attroff(COLOR_PAIR(PAIR_O) | A_BOLD);
         }
     } else {
         if (winner != ' ') {
-            attron(COLOR_PAIR(PAIR_WIN_MSG) | A_BOLD);
-            mvprintw(13, 10, "Player %c Wins!", winner);
-            attroff(COLOR_PAIR(PAIR_WIN_MSG) | A_BOLD);
+            sprintf(statusMsg, "Player %c Wins!", winner);
+            printCentered(13, statusMsg, PAIR_WIN_MSG, true);
         } else {
-            attron(COLOR_PAIR(PAIR_WIN_MSG) | A_BOLD);
-            mvprintw(13, 10, "Game ended in a draw!");
-            attroff(COLOR_PAIR(PAIR_WIN_MSG) | A_BOLD);
+            printCentered(13, "Game ended in a draw!", PAIR_WIN_MSG, true);
         }
     }
-    attroff(COLOR_PAIR(PAIR_STATUS) | A_BOLD);
 
     // Controls help
-    mvprintw(15, 8, "Controls: Arrow Keys to move, Enter to place");
-    mvprintw(16, 8, "          Q to quit, R to restart game");
+    printCentered(15, "Controls: Arrow Keys to move, Enter to place", PAIR_GRID);
+    printCentered(16, "          Q to quit, R to restart game", PAIR_GRID);
+
+    printCenter("/red/skibidi", screenHeight-1);
 
     refresh();
 }
@@ -186,9 +220,13 @@ void playTicTacToe() {
     curs_set(0);
     keypad(stdscr, TRUE);
 
+    // Get screen dimensions
+    getmaxyx(stdscr, screenHeight, screenWidth);
+
     // Setup colors if terminal supports them
     if (has_colors()) {
         initColors();
+        initPrintColors();
     }
 
     // Game loop

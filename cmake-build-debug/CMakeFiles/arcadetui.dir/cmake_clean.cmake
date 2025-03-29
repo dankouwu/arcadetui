@@ -4,6 +4,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/arcadetui.dir/src/main.cpp.o.d"
   "CMakeFiles/arcadetui.dir/src/tic_tac_toe.cpp.o"
   "CMakeFiles/arcadetui.dir/src/tic_tac_toe.cpp.o.d"
+  "CMakeFiles/arcadetui.dir/src/utils.cpp.o"
+  "CMakeFiles/arcadetui.dir/src/utils.cpp.o.d"
   "arcadetui"
   "arcadetui.pdb"
 )

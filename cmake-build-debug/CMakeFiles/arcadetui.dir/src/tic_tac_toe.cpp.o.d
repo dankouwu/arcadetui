@@ -153,4 +153,6 @@ CMakeFiles/arcadetui.dir/src/tic_tac_toe.cpp.o: \
  /usr/include/c++/14.2.1/cstdint /usr/include/c++/14.2.1/limits \
  /usr/include/c++/14.2.1/ctime \
  /usr/include/c++/14.2.1/bits/parse_numbers.h \
- /usr/include/c++/14.2.1/chrono
+ /usr/include/c++/14.2.1/chrono /usr/include/c++/14.2.1/cstring \
+ /usr/include/string.h /usr/include/strings.h \
+ /home/dnk/projects/Git/arcadetui/src/utils.hpp

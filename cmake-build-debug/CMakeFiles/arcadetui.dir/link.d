@@ -4,6 +4,7 @@ arcadetui: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/crtbeginS.o \
   CMakeFiles/arcadetui.dir/src/main.cpp.o \
   CMakeFiles/arcadetui.dir/src/tic_tac_toe.cpp.o \
+  CMakeFiles/arcadetui.dir/src/utils.cpp.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/../../../../lib/libcurses.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/../../../../lib/libcurses.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/../../../../lib/libcurses.so \
@@ -49,6 +50,8 @@ arcadetui: \
 CMakeFiles/arcadetui.dir/src/main.cpp.o:
 
 CMakeFiles/arcadetui.dir/src/tic_tac_toe.cpp.o:
+
+CMakeFiles/arcadetui.dir/src/utils.cpp.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/../../../../lib/libcurses.so:
 
