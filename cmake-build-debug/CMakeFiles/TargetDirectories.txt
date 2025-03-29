@@ -1,3 +1,0 @@
-/home/dnk/projects/Git/arcadetui/cmake-build-debug/CMakeFiles/arcadetui.dir
-/home/dnk/projects/Git/arcadetui/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/dnk/projects/Git/arcadetui/cmake-build-debug/CMakeFiles/rebuild_cache.dir
