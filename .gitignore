@@ -1,8 +1,8 @@
-# Ignore compiled binaries
 build/
 arcade
 *.o
 
-# Ignore temporary files
+cmake-build-debug
+
 *.swp
 
