@@ -1,8 +1,21 @@
 #include <iostream>
 #include <ncurses.h>
+#include <vector>
+
 #include "tic_tac_toe.hpp"
 
-void showTitleScreen() {
+// Title screen ASCII art
+const std::vector<std::string> title = {
+    " █████╗ ██████╗  ██████╗ █████╗ ██████╗ ███████╗████████╗██╗   ██╗██╗",
+    "██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝██║   ██║██║",
+    "███████║██████╔╝██║     ███████║██║  ██║█████╗     ██║   ██║   ██║██║",
+    "██╔══██║██╔══██╗██║     ██╔══██║██║  ██║██╔══╝     ██║   ██║   ██║██║",
+    "██║  ██║██║  ██║╚██████╗██║  ██║██████╔╝███████╗   ██║   ╚██████╔╝██║",
+    "╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═╝"
+};
+
+void drawTitleScreen() {
+    setlocale(LC_ALL, "");
     initscr();
     noecho();
     curs_set(0);
@@ -12,15 +25,23 @@ void showTitleScreen() {
     std::string options[] = {"Play Tic Tac Toe", "Exit"};
     int numOptions = sizeof(options) / sizeof(options[0]);
 
+    // Game loop for title screen
     while (true) {
         clear();
-        mvprintw(2, 5, "Welcome to TUI Arcade!");
-        mvprintw(4, 5, "Use arrow keys to navigate, Enter to select.");
 
+        // Display the title (ASCII art)
+        for (int i = 0; i < title.size(); i++) {
+            mvprintw(i, 5, title[i].c_str());
+        }
+
+        // Instructions
+        mvprintw(title.size() + 2, 5, "Use arrow keys to navigate, Enter to select.");
+
+        // Display menu options
         for (int i = 0; i < numOptions; i++) {
             if (i == choice)
                 attron(A_REVERSE);
-            mvprintw(6 + i, 5, options[i].c_str());
+            mvprintw(title.size() + 4 + i, 5, options[i].c_str());
             attroff(A_REVERSE);
         }
 
@@ -32,16 +53,17 @@ void showTitleScreen() {
         } else if (key == '\n' || key == '\r') {
             if (choice == 0) {
                 clear();
-                playTicTacToe();
+                playTicTacToe();  // Transition to Tic Tac Toe game
             } else {
-                break;
+                break;  // Exit the program
             }
         }
     }
-    endwin();
+
+    endwin();  // End ncurses mode
 }
 
 int main() {
-    showTitleScreen();
+    drawTitleScreen();  // Call the title screen function
     return 0;
 }

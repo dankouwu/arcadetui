@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/arcadetui.dir/link.d CMakeFiles/arcadetui.dir/src/main.cpp.o CMakeFiles/arcadetui.dir/src/tic_tac_toe.cpp.o -o arcadetui  -lcurses -lform
