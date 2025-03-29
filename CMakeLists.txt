@@ -1,6 +1,17 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.10)
 project(arcadetui)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 11)
 
-add_executable(arcadetui src/main.cpp)
+find_package(Curses REQUIRED)
+
+include_directories(src)
+
+set(SOURCES
+        src/main.cpp
+        src/tic_tac_toe.cpp
+)
+
+add_executable(arcadetui ${SOURCES})
+
+target_link_libraries(arcadetui ${CURSES_LIBRARIES})
