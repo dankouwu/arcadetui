@@ -6,7 +6,6 @@
 #include <chrono>
 #include <cstring>
 
-// Game state
 char board[3][3] = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
 int cursorX = 0, cursorY = 0;
 bool isXTurn = true;
@@ -61,7 +60,7 @@ void drawTitle() {
 void drawSeparators() {
     attron(COLOR_PAIR(PAIR_SEPARATOR) | A_BOLD);
 
-    int gridWidth = 11; // Width of the grid area
+    int gridWidth = 11;
     int startX = (screenWidth - gridWidth) / 2;
 
     for (int i = 0; i < 5; i++) {
@@ -76,7 +75,7 @@ void drawSeparators() {
 }
 
 void drawCell(int y, int x, char value) {
-    int gridWidth = 21; // Total width of the grid area including separators
+    int gridWidth = 21;
     int startX = (screenWidth - gridWidth) / 2;
 
     int screenY = y * 2 + 6;
@@ -125,7 +124,7 @@ void drawBoard() {
 
         int msgLen = strlen(statusMsg);
         int centerX = (screenWidth - msgLen) / 2;
-        int xPos = centerX + 8; // Position after "Player " in the message
+        int xPos = centerX + 8;
 
         if (isXTurn) {
             attron(COLOR_PAIR(PAIR_X) | A_BOLD);

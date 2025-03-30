@@ -33,30 +33,18 @@ const std::vector<std::string> title = {
     "               ╚═╝    ╚═════╝ ╚═╝               ",
 };
 
-
 void printTitle(const std::vector<std::string>& lines, int startY, int termWidth) {
-    setlocale(LC_ALL, ""); // Make sure locale is set for wide character handling
+    setlocale(LC_ALL, "");
 
     for (int i = 0; i < lines.size(); i++) {
-        // Convert UTF-8 string to wide string
-        // Need to allocate enough space for the wide characters
-        size_t bufSize = lines[i].length() + 1; // +1 for null terminator
+        size_t bufSize = lines[i].length() + 1;
         wchar_t* wstr = new wchar_t[bufSize];
-
-        // Convert the string - mbstowcs handles UTF-8 to wide char conversion
         mbstowcs(wstr, lines[i].c_str(), bufSize);
-
-        // Get the display width of the wide string
         int displayWidth = wcswidth(wstr, bufSize);
-        if (displayWidth < 0) displayWidth = lines[i].length(); // Fallback if wcswidth fails
-
-        // Center based on display width
+        if (displayWidth < 0) displayWidth = lines[i].length();
         int startX = (termWidth - displayWidth) / 2;
         if (startX < 0) startX = 0;
-
         mvprintw(startY + i, startX, "%s", lines[i].c_str());
-
-        // Clean up
         delete[] wstr;
     }
     refresh();
@@ -88,42 +76,27 @@ void drawTitleScreen() {
 
     while (true) {
         clear();
-
         getmaxyx(stdscr, termHeight, termWidth);
-
-        // Calculate the total content height
         int titleHeight = title.size();
         int menuHeight = numOptions;
         int guidanceHeight = 1;
-        int spacing = 2; // Space between elements
-
+        int spacing = 2;
         int totalContentHeight = titleHeight + spacing + menuHeight + spacing + guidanceHeight;
-
-        // Calculate starting Y position to center everything vertically
         int startY = (termHeight - totalContentHeight) / 2;
         if (startY < 0) startY = 0;
-
-        // Print title centered vertically and horizontally
         printTitle(title, startY, termWidth);
-
-        // Calculate Y positions for menu options
         int menuY = startY + titleHeight + spacing;
 
-        // Print menu options
         for (int i = 0; i < numOptions; i++) {
             if (i == choice)
                 attron(A_REVERSE);
-
             int optionX = (termWidth - options[i].size()) / 2;
             mvprintw(menuY + i, optionX, "%s", options[i].c_str());
-
             attroff(A_REVERSE);
         }
 
-        // Print guidance text at the bottom of our content area
         std::string guide = "Use arrow keys to navigate, Enter to select.";
         mvprintw(termHeight-2, (termWidth - guide.size()) / 2, "%s", guide.c_str());
-
         refresh();
 
         int key = getch();
@@ -132,22 +105,21 @@ void drawTitleScreen() {
         } else if (key == KEY_DOWN) {
             choice = (choice + 1) % numOptions;
         } else if (key == KEY_RESIZE) {
-            // Handle terminal resize
             getmaxyx(stdscr, termHeight, termWidth);
         } else if (key == '\n' || key == '\r') {
             if (choice == 0) {
                 clear();
-                playTicTacToe();  // Transition to Tic Tac Toe game
+                playTicTacToe();
             } else {
-                break;  // Exit the program
+                break;
             }
         }
     }
 
-    endwin();  // End ncurses mode
+    endwin();
 }
 
 int main() {
-    drawTitleScreen();  // Call the title screen function
+    drawTitleScreen();
     return 0;
 }
