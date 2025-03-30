@@ -5,7 +5,6 @@
 #include <thread>
 #include <chrono>
 #include <cstring>
-#include <utils.hpp>
 
 // Game state
 char board[3][3] = {{' ', ' ', ' '}, {' ', ' ', ' '}, {' ', ' ', ' '}};
@@ -15,10 +14,8 @@ bool gameOver = false;
 char winner = ' ';
 bool isBoardFull = false;
 
-// Screen dimensions
 int screenWidth, screenHeight;
 
-// Color pairs
 #define PAIR_TITLE 1
 #define PAIR_GRID 2
 #define PAIR_X 3
@@ -40,7 +37,6 @@ void initColors() {
     init_pair(PAIR_SEPARATOR, COLOR_BLUE, COLOR_BLACK);
 }
 
-// Utility function to center text
 void printCentered(int y, const char* text, int colorPair, bool bold = false) {
     int x = (screenWidth - strlen(text)) / 2;
     if (bold) attron(COLOR_PAIR(colorPair) | A_BOLD);
@@ -65,17 +61,14 @@ void drawTitle() {
 void drawSeparators() {
     attron(COLOR_PAIR(PAIR_SEPARATOR) | A_BOLD);
 
-    // Calculate center position for the grid
     int gridWidth = 11; // Width of the grid area
     int startX = (screenWidth - gridWidth) / 2;
 
-    // Vertical separators
     for (int i = 0; i < 5; i++) {
         mvprintw(6 + i, startX + 6, "|");
         mvprintw(6 + i, startX + 13, "|");
     }
 
-    // Horizontal separators
     mvprintw(8, startX, "-----------");
     mvprintw(10, startX, "-----------");
 
@@ -89,19 +82,16 @@ void drawCell(int y, int x, char value) {
     int screenY = y * 2 + 6;
     int screenX = startX + x * 7 + 1;
 
-    // Draw cell
     attron(COLOR_PAIR(PAIR_GRID));
     mvprintw(screenY, screenX, "[   ]");
     attroff(COLOR_PAIR(PAIR_GRID));
 
-    // Highlight the cursor position
     if (cursorX == x && cursorY == y && !gameOver) {
         attron(COLOR_PAIR(PAIR_CURSOR));
         mvprintw(screenY, screenX, "[   ]");
         attroff(COLOR_PAIR(PAIR_CURSOR));
     }
 
-    // Draw X or O
     if (value == 'X') {
         attron(COLOR_PAIR(PAIR_X) | A_BOLD);
         mvprintw(screenY, screenX + 2, "X");
@@ -116,29 +106,23 @@ void drawCell(int y, int x, char value) {
 void drawBoard() {
     clear();
 
-    // Get current screen dimensions
     getmaxyx(stdscr, screenHeight, screenWidth);
 
-    // Draw title
     drawTitle();
 
-    // Draw separators first
     drawSeparators();
 
-    // Draw the board with cells
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             drawCell(i, j, board[i][j]);
         }
     }
 
-    // Draw status message
     char statusMsg[50];
     if (!gameOver) {
         sprintf(statusMsg, "Player %c's turn", isXTurn ? 'X' : 'O');
         printCentered(13, statusMsg, PAIR_STATUS, true);
 
-        // Modify the position of the X/O indicator to be centered
         int msgLen = strlen(statusMsg);
         int centerX = (screenWidth - msgLen) / 2;
         int xPos = centerX + 8; // Position after "Player " in the message
@@ -161,17 +145,13 @@ void drawBoard() {
         }
     }
 
-    // Controls help
     printCentered(15, "Controls: Arrow Keys to move, Enter to place", PAIR_GRID);
     printCentered(16, "          Q to quit, R to restart game", PAIR_GRID);
-
-    printCenter("/red/skibidi", screenHeight-1);
 
     refresh();
 }
 
 bool checkWin(char player) {
-    // Check rows and columns
     for (int i = 0; i < 3; i++) {
         if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) ||
             (board[0][i] == player && board[1][i] == player && board[2][i] == player)) {
@@ -179,7 +159,6 @@ bool checkWin(char player) {
         }
     }
 
-    // Check diagonals
     return (board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
            (board[0][2] == player && board[1][1] == player && board[2][0] == player);
 }
@@ -196,14 +175,12 @@ bool isBoardFullCheck() {
 }
 
 void resetGame() {
-    // Reset board
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             board[i][j] = ' ';
         }
     }
 
-    // Reset game state
     cursorX = 0;
     cursorY = 0;
     isXTurn = true;
@@ -213,23 +190,18 @@ void resetGame() {
 }
 
 void playTicTacToe() {
-    // Initialize ncurses
     initscr();
     cbreak();
     noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
 
-    // Get screen dimensions
     getmaxyx(stdscr, screenHeight, screenWidth);
 
-    // Setup colors if terminal supports them
     if (has_colors()) {
         initColors();
-        initPrintColors();
     }
 
-    // Game loop
     bool running = true;
     while (running) {
         drawBoard();
@@ -273,6 +245,5 @@ void playTicTacToe() {
         }
     }
 
-    // Clean up and exit
     endwin();
 }

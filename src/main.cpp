@@ -1,11 +1,23 @@
 #include <iostream>
 #include <ncurses.h>
 #include <vector>
+#include <wchar.h>
 
 #include "tic_tac_toe.hpp"
 
-// Title screen ASCII art
+#define BLACK 1
+#define RED 2
+#define GREEN 3
+#define YELLOW 4
+#define BLUE 5
+#define MAGENTA 6
+#define CYAN 7
+#define WHITE 8
+
+int termHeight, termWidth;
+
 const std::vector<std::string> title = {
+    "                                                ",
     " █████╗ ██████╗  ██████╗ █████╗ ██████╗ ███████╗",
     "██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔════╝",
     "███████║██████╔╝██║     ███████║██║  ██║█████╗  ",
@@ -21,6 +33,35 @@ const std::vector<std::string> title = {
     "               ╚═╝    ╚═════╝ ╚═╝               ",
 };
 
+
+void printTitle(const std::vector<std::string>& lines, int startY, int termWidth) {
+    setlocale(LC_ALL, ""); // Make sure locale is set for wide character handling
+
+    for (int i = 0; i < lines.size(); i++) {
+        // Convert UTF-8 string to wide string
+        // Need to allocate enough space for the wide characters
+        size_t bufSize = lines[i].length() + 1; // +1 for null terminator
+        wchar_t* wstr = new wchar_t[bufSize];
+
+        // Convert the string - mbstowcs handles UTF-8 to wide char conversion
+        mbstowcs(wstr, lines[i].c_str(), bufSize);
+
+        // Get the display width of the wide string
+        int displayWidth = wcswidth(wstr, bufSize);
+        if (displayWidth < 0) displayWidth = lines[i].length(); // Fallback if wcswidth fails
+
+        // Center based on display width
+        int startX = (termWidth - displayWidth) / 2;
+        if (startX < 0) startX = 0;
+
+        mvprintw(startY + i, startX, "%s", lines[i].c_str());
+
+        // Clean up
+        delete[] wstr;
+    }
+    refresh();
+}
+
 void drawTitleScreen() {
     setlocale(LC_ALL, "");
     initscr();
@@ -28,35 +69,71 @@ void drawTitleScreen() {
     curs_set(0);
     keypad(stdscr, TRUE);
 
+    if (has_colors()) {
+        start_color();
+    }
+
+    init_pair(BLACK, COLOR_BLACK, COLOR_BLACK);
+    init_pair(RED, COLOR_RED, COLOR_BLACK);
+    init_pair(GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair(YELLOW, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(BLUE, COLOR_BLUE, COLOR_BLACK);
+    init_pair(MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(CYAN, COLOR_CYAN, COLOR_BLACK);
+    init_pair(WHITE, COLOR_WHITE, COLOR_BLACK);
+
     int choice = 0;
     std::string options[] = {"Play Tic Tac Toe", "Exit"};
     int numOptions = sizeof(options) / sizeof(options[0]);
 
-    // Game loop for title screen
     while (true) {
         clear();
 
-        // Display the title (ASCII art)
-        for (int i = 0; i < title.size(); i++) {
-            mvprintw(i, 5, title[i].c_str());
-        }
+        getmaxyx(stdscr, termHeight, termWidth);
 
-        // Instructions
-        mvprintw(title.size() + 2, 5, "Use arrow keys to navigate, Enter to select.");
+        // Calculate the total content height
+        int titleHeight = title.size();
+        int menuHeight = numOptions;
+        int guidanceHeight = 1;
+        int spacing = 2; // Space between elements
 
-        // Display menu options
+        int totalContentHeight = titleHeight + spacing + menuHeight + spacing + guidanceHeight;
+
+        // Calculate starting Y position to center everything vertically
+        int startY = (termHeight - totalContentHeight) / 2;
+        if (startY < 0) startY = 0;
+
+        // Print title centered vertically and horizontally
+        printTitle(title, startY, termWidth);
+
+        // Calculate Y positions for menu options
+        int menuY = startY + titleHeight + spacing;
+
+        // Print menu options
         for (int i = 0; i < numOptions; i++) {
             if (i == choice)
                 attron(A_REVERSE);
-            mvprintw(title.size() + 4 + i, 5, options[i].c_str());
+
+            int optionX = (termWidth - options[i].size()) / 2;
+            mvprintw(menuY + i, optionX, "%s", options[i].c_str());
+
             attroff(A_REVERSE);
         }
+
+        // Print guidance text at the bottom of our content area
+        std::string guide = "Use arrow keys to navigate, Enter to select.";
+        mvprintw(termHeight-2, (termWidth - guide.size()) / 2, "%s", guide.c_str());
+
+        refresh();
 
         int key = getch();
         if (key == KEY_UP) {
             choice = (choice - 1 + numOptions) % numOptions;
         } else if (key == KEY_DOWN) {
             choice = (choice + 1) % numOptions;
+        } else if (key == KEY_RESIZE) {
+            // Handle terminal resize
+            getmaxyx(stdscr, termHeight, termWidth);
         } else if (key == '\n' || key == '\r') {
             if (choice == 0) {
                 clear();

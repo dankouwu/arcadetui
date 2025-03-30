@@ -12,3 +12,5 @@ cmake -G "Unix Makefiles" ..
 
 echo "Building the project..."
 make
+
+../cmake-build-debug/arcadetui
