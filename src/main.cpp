@@ -14,7 +14,7 @@
 #define CYAN 7
 #define WHITE 8
 
-int termHeight, termWidth;
+static int termHeight, termWidth;
 
 const std::vector<std::string> title = {
     "                                                ",
@@ -34,17 +34,22 @@ const std::vector<std::string> title = {
 };
 
 void printTitle(const std::vector<std::string>& lines, int startY, int termWidth) {
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, ""); // Make sure locale is set for wide character handling
 
     for (int i = 0; i < lines.size(); i++) {
-        size_t bufSize = lines[i].length() + 1;
+        size_t bufSize = lines[i].length() + 1; // +1 for null terminator
         wchar_t* wstr = new wchar_t[bufSize];
-        mbstowcs(wstr, lines[i].c_str(), bufSize);
+
+         mbstowcs(wstr, lines[i].c_str(), bufSize);
+
         int displayWidth = wcswidth(wstr, bufSize);
-        if (displayWidth < 0) displayWidth = lines[i].length();
+        if (displayWidth < 0) displayWidth = lines[i].length(); // Fallback if wcswidth fails
+
         int startX = (termWidth - displayWidth) / 2;
         if (startX < 0) startX = 0;
+
         mvprintw(startY + i, startX, "%s", lines[i].c_str());
+
         delete[] wstr;
     }
     refresh();

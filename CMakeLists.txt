@@ -10,8 +10,11 @@ include_directories(src)
 set(SOURCES
         src/main.cpp
         src/tic_tac_toe.cpp
+        src/ttt_robot.cpp
 )
 
 add_executable(arcadetui ${SOURCES})
+
+add_compile_options(-fpermissive)
 
 target_link_libraries(arcadetui ${CURSES_LIBRARIES})
